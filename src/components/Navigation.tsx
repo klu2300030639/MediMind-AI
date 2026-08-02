@@ -14,6 +14,7 @@ import {
   X,
   Bell,
   LogIn,
+  ShieldCheck,
   UserPlus,
   LogOut
 } from 'lucide-react';
@@ -47,6 +48,7 @@ export function Navigation({
     { id: 'appointments', label: 'Appointments', icon: <Calendar className="w-4 h-4" /> },
     { id: 'reports', label: 'Report OCR', icon: <FileText className="w-4 h-4" /> },
     { id: 'profile', label: 'Medical Passport', icon: <User className="w-4 h-4" /> },
+    { id: 'about', label: 'About Us', icon: <ShieldCheck className="w-4 h-4" /> },
   ];
 
   return (

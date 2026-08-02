@@ -11,6 +11,7 @@ import { AppointmentManager } from './components/AppointmentManager';
 import { ReportAnalyzer } from './components/ReportAnalyzer';
 import { HealthProfile } from './components/HealthProfile';
 import { EmergencySOS } from './components/EmergencySOS';
+import { AboutSection } from './components/AboutSection';
 import { AuthModal } from './components/AuthModal';
 
 export function App() {
@@ -114,6 +115,8 @@ export function App() {
         );
       case 'emergency':
         return <EmergencySOS onNavigate={setCurrentScreen} />;
+      case 'about':
+        return <AboutSection onNavigate={setCurrentScreen} onOpenAuth={handleOpenAuth} />;
       default:
         return (
           <UserDashboard 

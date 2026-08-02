@@ -8,7 +8,8 @@ export type ScreenId =
   | 'appointments'
   | 'reports'
   | 'profile'
-  | 'emergency';
+  | 'emergency'
+  | 'about';
 
 export interface UserProfile {
   name: string;
@@ -18,8 +19,8 @@ export interface UserProfile {
   address?: string;
   city?: string;
   state?: string;
-  country?: string;
   zipCode?: string;
+  country?: string;
   dateOfBirth?: string;
   age: number;
   gender: string;
