@@ -293,7 +293,7 @@ export function AppointmentManager({ onNavigate, userProfile }: AppointmentManag
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-extrabold text-slate-900 text-sm">{doc.name}</h3>
-                    <ShieldCheck className="w-4 h-4 text-[#0066FF]" title="Verified Doctor" />
+                    <span title="Verified Doctor"><ShieldCheck className="w-4 h-4 text-[#0066FF]" /></span>
                   </div>
                   <p className="text-[11px] text-slate-500 font-semibold">{doc.qualifications}</p>
                   <p className="text-xs text-[#0066FF] font-bold">{doc.specialty}</p>
