@@ -11,8 +11,14 @@ export type ScreenId =
   | 'emergency';
 
 export interface UserProfile {
-  email?: string;
   name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  dateOfBirth?: string;
   age: number;
   gender: string;
   bloodGroup: string;
@@ -23,7 +29,9 @@ export interface UserProfile {
   primaryGoal: string;
   connectedDevice: string;
   isOnboarded: boolean;
-  avatar?: string;
+  insuranceProvider?: string;
+  policyNumber?: string;
+  primaryPhysician?: string;
 }
 
 export interface ChatMessage {
@@ -31,18 +39,25 @@ export interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
-  sources?: { title: string; url: string }[];
-  isWarning?: boolean;
+  sources?: string[];
+  riskLevel?: 'Low' | 'Moderate' | 'High';
+}
+
+export interface Symptom {
+  id: string;
+  name: string;
+  category: string;
+  severity: number;
 }
 
 export interface Medication {
   id: string;
   name: string;
   dosage: string;
-  time: string;
-  slot: 'Morning' | 'Noon' | 'Evening' | 'Bedtime';
+  frequency: string;
+  timeOfDay: 'Morning' | 'Afternoon' | 'Evening' | 'Bedtime';
   taken: boolean;
-  refillLeft: number;
+  refillRemaining: number;
 }
 
 export interface Appointment {
@@ -51,22 +66,15 @@ export interface Appointment {
   specialty: string;
   date: string;
   time: string;
-  type: 'In-Person' | 'Video Call';
-  status: 'Confirmed' | 'Completed' | 'Pending';
-  avatar: string;
+  type: 'In-Person' | 'Telehealth Video';
+  status: 'Upcoming' | 'Completed' | 'Cancelled';
 }
 
-export interface LabResult {
-  parameter: string;
-  value: string;
-  unit: string;
-  range: string;
-  status: 'Normal' | 'Elevated' | 'Low' | 'High';
-}
-
-export interface SymptomAssessment {
-  category: string;
-  symptoms: string[];
-  severity: number;
-  duration: string;
+export interface HealthMetric {
+  date: string;
+  heartRate: number;
+  sysBP: number;
+  diaBP: number;
+  sleepHours: number;
+  oxygenLevel: number;
 }
