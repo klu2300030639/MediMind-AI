@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { UserProfile, ScreenId } from '../types';
 import { 
   ShieldCheck, 
@@ -14,17 +15,43 @@ import {
   FileCheck, 
   Lock,
   Download,
-  Share2,
-  CheckCircle2
+  CheckCircle2,
+  X,
+  Save
 } from 'lucide-react';
 
 interface HealthProfileProps {
   userProfile: UserProfile;
   onNavigate: (screen: ScreenId) => void;
   onOpenOnboarding: () => void;
+  onUpdateProfile?: (updated: UserProfile) => void;
 }
 
-export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: HealthProfileProps) {
+export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpdateProfile }: HealthProfileProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Editable form state
+  const [formData, setFormData] = useState<UserProfile>(userProfile);
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onUpdateProfile) {
+      onUpdateProfile(formData);
+    } else {
+      try {
+        localStorage.setItem('medimind_active_patient_session', JSON.stringify(formData));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setIsEditing(false);
+  };
+
+  const isInsuranceNA = !userProfile.insuranceProvider || 
+                        userProfile.insuranceProvider.toLowerCase().includes('not applicable') || 
+                        userProfile.insuranceProvider.toLowerCase().includes('n/a') ||
+                        userProfile.insuranceProvider.toLowerCase().includes('none');
+
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200 pb-20">
       
@@ -55,17 +82,11 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <button
-              onClick={onOpenOnboarding}
+              onClick={() => setIsEditing(true)}
               className="flex-1 md:flex-initial bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 backdrop-blur-md border border-white/10"
             >
               <Edit3 className="w-4 h-4" />
-              Edit Information
-            </button>
-            <button
-              className="flex-1 md:flex-initial bg-[#0066FF] hover:bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
-            >
-              <Download className="w-4 h-4" />
-              Export Passport PDF
+              Edit Profile Data
             </button>
           </div>
         </div>
@@ -82,23 +103,27 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-[#0066FF]" />
-                Residential Address & Contact Information
+                Residential Address & Contact Details
               </h2>
-              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                Verified Address
-              </span>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="text-xs font-bold text-[#0066FF] hover:underline flex items-center gap-1"
+              >
+                <Edit3 className="w-3 h-3" />
+                Edit Address
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-1 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                 <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Street Address</span>
-                <p className="font-bold text-slate-800 text-sm">{userProfile.address || '742 Evergreen Terrace'}</p>
+                <p className="font-bold text-slate-800 text-sm">{userProfile.address || '123 Medical Plaza Way'}</p>
               </div>
 
               <div className="space-y-1 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                 <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">City, State, Zip & Country</span>
                 <p className="font-bold text-slate-800 text-sm">
-                  {userProfile.city || 'Springfield'}, {userProfile.state || 'IL'} {userProfile.zipCode || '62704'}, {userProfile.country || 'United States'}
+                  {userProfile.city || 'Guntur'}, {userProfile.state || 'Andhra Pradesh'} {userProfile.zipCode || '522502'}, {userProfile.country || 'India'}
                 </p>
               </div>
 
@@ -106,7 +131,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
                 <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Phone Number</span>
                 <p className="font-bold text-slate-800 text-sm flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 text-[#0066FF]" />
-                  {userProfile.phone || '+1 (555) 234-5678'}
+                  {userProfile.phone || '+91 9876543210'}
                 </p>
               </div>
 
@@ -147,7 +172,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
 
               <div className="bg-amber-50/50 border border-amber-100 p-3.5 rounded-xl">
                 <span className="text-[10px] uppercase tracking-wider font-bold text-amber-600">Date of Birth</span>
-                <p className="text-xs font-bold text-slate-900 mt-1">{userProfile.dateOfBirth || '1992-08-14'}</p>
+                <p className="text-xs font-bold text-slate-900 mt-1">{userProfile.dateOfBirth || '1996-05-14'}</p>
               </div>
             </div>
 
@@ -176,19 +201,29 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
               <CreditCard className="w-5 h-5 text-indigo-600" />
-              Insurance & Coverage
+              Health Insurance Status
             </h2>
 
             <div className="space-y-3 text-xs">
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Insurance Provider</span>
-                <p className="font-bold text-slate-900 text-sm mt-0.5">{userProfile.insuranceProvider || 'Blue Cross Blue Shield'}</p>
-              </div>
+              {isInsuranceNA ? (
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center space-y-1">
+                  <span className="text-xs font-bold text-slate-600 block">Insurance Provider</span>
+                  <p className="font-extrabold text-slate-800 text-sm">N/A - Not Applicable</p>
+                  <span className="text-[11px] text-slate-500 block pt-1">(Self-Pay Patient Record)</span>
+                </div>
+              ) : (
+                <>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Insurance Provider</span>
+                    <p className="font-bold text-slate-900 text-sm mt-0.5">{userProfile.insuranceProvider}</p>
+                  </div>
 
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Policy ID Number</span>
-                <p className="font-mono font-bold text-indigo-600 text-sm mt-0.5">{userProfile.policyNumber || 'BCBS-9948201'}</p>
-              </div>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Policy ID Number</span>
+                    <p className="font-mono font-bold text-indigo-600 text-sm mt-0.5">{userProfile.policyNumber || 'N/A'}</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -204,7 +239,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
                 MD
               </div>
               <div className="text-xs">
-                <p className="font-bold text-slate-900 text-sm">{userProfile.primaryPhysician || 'Dr. Sarah Lin, MD'}</p>
+                <p className="font-bold text-slate-900 text-sm">{userProfile.primaryPhysician || 'Dr. Marcus Vance, MD'}</p>
                 <p className="text-slate-500">Internal Medicine & Primary Care</p>
               </div>
             </div>
@@ -226,6 +261,115 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
         </div>
 
       </div>
+
+      {/* EDIT PROFILE MODAL */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-[#0066FF]" />
+                Edit My Profile Data
+              </h3>
+              <button onClick={() => setIsEditing(false)} className="p-1 text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={formData.phone || ''}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Country</label>
+                  <input
+                    type="text"
+                    value={formData.country || ''}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Street Address</label>
+                <input
+                  type="text"
+                  value={formData.address || ''}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={formData.city || ''}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">State</label>
+                  <input
+                    type="text"
+                    value={formData.state || ''}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Pincode</label>
+                  <input
+                    type="text"
+                    value={formData.zipCode || ''}
+                    onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Insurance Provider (Or "Not Applicable")</label>
+                <input
+                  type="text"
+                  value={formData.insuranceProvider || ''}
+                  onChange={(e) => setFormData({ ...formData, insuranceProvider: e.target.value })}
+                  placeholder="e.g. Not Applicable"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 shadow"
+              >
+                <Save className="w-4 h-4" />
+                <span>Save My Updated Profile Data</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
