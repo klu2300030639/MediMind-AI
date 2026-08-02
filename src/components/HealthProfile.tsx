@@ -96,9 +96,9 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding }: Hea
               </div>
 
               <div className="space-y-1 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-                <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">City, State & Zip</span>
+                <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">City, State, Zip & Country</span>
                 <p className="font-bold text-slate-800 text-sm">
-                  {userProfile.city || 'Springfield'}, {userProfile.state || 'IL'} {userProfile.zipCode || '62704'}
+                  {userProfile.city || 'Springfield'}, {userProfile.state || 'IL'} {userProfile.zipCode || '62704'}, {userProfile.country || 'United States'}
                 </p>
               </div>
 

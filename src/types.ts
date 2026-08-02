@@ -18,6 +18,7 @@ export interface UserProfile {
   address?: string;
   city?: string;
   state?: string;
+  country?: string;
   zipCode?: string;
   dateOfBirth?: string;
   age: number;

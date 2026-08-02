@@ -25,6 +25,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [country, setCountry] = useState('United States');
   const [dateOfBirth, setDateOfBirth] = useState('1996-05-14');
   const [age, setAge] = useState<number>(30);
   const [gender, setGender] = useState('Female');
@@ -58,6 +59,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
           city: 'Springfield',
           state: 'IL',
           zipCode: '62704',
+          country: 'United States',
           dateOfBirth: '1992-08-14',
           age: 32,
           gender: 'Female',
@@ -85,6 +87,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
         city: 'New York',
         state: 'NY',
         zipCode: '10001',
+        country: 'United States',
         dateOfBirth: '1995-01-01',
         age: 30,
         gender: 'Patient',
@@ -118,6 +121,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
       city: city || 'San Francisco',
       state: state || 'CA',
       zipCode: zipCode || '94102',
+      country: country || 'United States',
       dateOfBirth,
       age: Number(age),
       gender,
@@ -155,6 +159,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
       city: 'Springfield',
       state: 'IL',
       zipCode: '62704',
+          country: 'United States',
       dateOfBirth: '1992-08-14',
       age: 32,
       gender: 'Female',
@@ -368,7 +373,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
                     <input
@@ -380,7 +385,7 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">State / Prov</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">State / Province</label>
                     <input
                       type="text"
                       value={state}
@@ -389,13 +394,27 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
                     />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Zip Code</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Postal / Zip Code</label>
                     <input
                       type="text"
                       value={zipCode}
                       onChange={(e) => setZipCode(e.target.value)}
                       placeholder="10001"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Country *</label>
+                    <input
+                      type="text"
+                      required
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      placeholder="United States / India / UK"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
                     />
                   </div>
