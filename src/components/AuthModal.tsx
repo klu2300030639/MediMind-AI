@@ -25,7 +25,65 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
-  const [country, setCountry] = useState('United States');
+    const [country, setCountry] = useState('United States');
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeMessage, setPincodeMessage] = useState('');
+
+  const handlePincodeLookup = async (code: string) => {
+    setZipCode(code);
+    const cleanCode = code.trim();
+    if (!cleanCode || cleanCode.length < 3) return;
+
+    setPincodeLoading(true);
+
+    try {
+      // 1. Try Indian postal pincode API (6 digits)
+      if (/^\d{6}$/.test(cleanCode)) {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${cleanCode}`);
+        const data = await res.json();
+        if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice?.length > 0) {
+          const po = data[0].PostOffice[0];
+          const detectedCity = po.District || po.Block || po.Name || '';
+          const detectedState = po.State || '';
+          const detectedCountry = po.Country || 'India';
+          
+          if (detectedCity) setCity(detectedCity);
+          if (detectedState) setState(detectedState);
+          if (detectedCountry) setCountry(detectedCountry);
+
+          setPincodeMessage(`Auto-detected: ${detectedCity}, ${detectedState}, ${detectedCountry}`);
+          setPincodeLoading(false);
+          return;
+        }
+      }
+
+      // 2. Try Zippopotam for US (5 digits)
+      if (/^\d{5}$/.test(cleanCode)) {
+        const res = await fetch(`https://api.zippopotam.us/us/${cleanCode}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.places && data.places.length > 0) {
+            const place = data.places[0];
+            const detectedCity = place['place name'];
+            const detectedState = place['state abbreviation'] || place['state'];
+            const detectedCountry = data['country'] || 'United States';
+
+            setCity(detectedCity);
+            setState(detectedState);
+            setCountry(detectedCountry);
+
+            setPincodeMessage(`Auto-detected: ${detectedCity}, ${detectedState}, ${detectedCountry}`);
+            setPincodeLoading(false);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Pincode lookup error', e);
+    } finally {
+      setPincodeLoading(false);
+    }
+  };
   const [dateOfBirth, setDateOfBirth] = useState('1996-05-14');
   const [age, setAge] = useState<number>(30);
   const [gender, setGender] = useState('Female');
@@ -398,14 +456,19 @@ export function AuthModal({ onLoginSuccess, onClose, initialMode = 'login' }: Au
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Postal / Zip Code</label>
-                    <input
-                      type="text"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
-                      placeholder="10001"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
-                    />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                      <span>Postal / PIN Code</span>
+                      {pincodeLoading && <span className="text-[10px] text-blue-600 animate-pulse">Auto-detecting...</span>}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={zipCode}
+                        onChange={(e) => handlePincodeLookup(e.target.value)}
+                        placeholder="e.g. 522502 or 90210"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Country *</label>
