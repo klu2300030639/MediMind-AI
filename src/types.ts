@@ -11,6 +11,7 @@ export type ScreenId =
   | 'emergency';
 
 export interface UserProfile {
+  email?: string;
   name: string;
   age: number;
   gender: string;
