@@ -1,19 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="medGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0066FF"/>
-      <stop offset="100%" stop-color="#4F46E5"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="120" fill="url(#medGrad)"/>
-  
-  <!-- Medical Cross / Shield outline -->
-  <path d="M256 90 L380 140 V240 C380 330 256 410 256 410 C256 410 132 330 132 240 V140 L256 90 Z" fill="#ffffff" opacity="0.15"/>
-  
-  <!-- Glowing Heartbeat Pulse Line -->
-  <path d="M120 256 H190 L215 190 L245 320 L275 220 L295 256 H392" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  
-  <!-- Heart Icon overlay top right -->
-  <circle cx="370" cy="140" r="32" fill="#10B981"/>
+  <rect width="512" height="512" rx="120" fill="#0066FF"/>
+  <path d="M256 100 C170 40, 80 130, 150 230 L256 340 L362 230 C432 130, 342 40, 256 100 Z" fill="#ffffff"/>
+  <path d="M130 256 H195 L220 180 L250 330 L280 220 L300 256 H382" stroke="#0066FF" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="370" cy="140" r="36" fill="#10B981"/>
   <path d="M370 148 L364 142 C359 137 359 130 364 125 C369 120 376 120 380 125 L370 135 L360 125 C364 120 371 120 376 125 C381 130 381 137 376 142 L370 148 Z" fill="#ffffff"/>
 </svg>
