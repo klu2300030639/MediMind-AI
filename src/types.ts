@@ -12,6 +12,7 @@ export type ScreenId =
 
 export interface UserProfile {
   name: string;
+  avatar?: string;
   email?: string;
   phone?: string;
   address?: string;
@@ -39,8 +40,9 @@ export interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
-  sources?: string[];
+  sources?: any[];
   riskLevel?: 'Low' | 'Moderate' | 'High';
+  isWarning?: boolean;
 }
 
 export interface Symptom {
@@ -54,20 +56,24 @@ export interface Medication {
   id: string;
   name: string;
   dosage: string;
-  frequency: string;
-  timeOfDay: 'Morning' | 'Afternoon' | 'Evening' | 'Bedtime';
+  frequency?: string;
+  timeOfDay?: 'Morning' | 'Afternoon' | 'Evening' | 'Bedtime';
+  time?: string;
+  slot?: string;
   taken: boolean;
-  refillRemaining: number;
+  refillRemaining?: number;
+  refillLeft?: any;
 }
 
 export interface Appointment {
   id: string;
   doctorName: string;
   specialty: string;
+  avatar?: string;
   date: string;
   time: string;
-  type: 'In-Person' | 'Telehealth Video';
-  status: 'Upcoming' | 'Completed' | 'Cancelled';
+  type: string;
+  status: string;
 }
 
 export interface HealthMetric {
@@ -77,4 +83,16 @@ export interface HealthMetric {
   diaBP: number;
   sleepHours: number;
   oxygenLevel: number;
+}
+
+export interface LabResult {
+  id?: string;
+  testName?: string;
+  parameter?: string;
+  value: string;
+  unit: string;
+  referenceRange?: string;
+  range?: string;
+  status: 'Normal' | 'Elevated' | 'Low' | 'Critical';
+  category?: string;
 }
