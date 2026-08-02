@@ -57,39 +57,36 @@ export function App() {
     setCurrentScreen('landing');
   };
 
-  const renderScreen = () => {
-    // If not authenticated and trying to access private screens, redirect or show guest view
-    const activeProfile = currentUser || {
-      name: 'Guest Patient (Demo)',
-      age: 30,
-      gender: 'Guest',
-      bloodGroup: 'O+',
-      allergies: ['None Specified'],
-      medicalId: '#MM-GUEST',
-      emergencyContactName: 'Emergency Hotline 911',
-      emergencyContactPhone: '+1 (555) 911-0000',
-      primaryGoal: 'Sign In To Personalize',
-      connectedDevice: 'Demo Mode Active',
-      isOnboarded: false,
-    };
+  const handleUpdateProfile = (updated: UserProfile) => {
+    setCurrentUser(updated);
+    try {
+      localStorage.setItem('medimind_active_patient_session', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
+  const renderScreen = () => {
+    // REQ 5: STRICT AUTHENTICATION GATE
+    // If not logged in, force Landing Page or Auth Modal
+    if (!currentUser) {
+      return (
+        <LandingPage 
+          onNavigate={(screen) => {
+            handleOpenAuth('login');
+          }} 
+        />
+      );
+    }
+
+    // User is Logged In: Render personalized dashboard and modules
     switch (currentScreen) {
       case 'landing':
-        return (
-          <LandingPage 
-            onNavigate={(screen) => {
-              if (screen !== 'landing' && !currentUser) {
-                handleOpenAuth('signup');
-              } else {
-                setCurrentScreen(screen);
-              }
-            }} 
-          />
-        );
+        return <LandingPage onNavigate={setCurrentScreen} />;
       case 'dashboard':
         return (
           <UserDashboard 
-            userProfile={activeProfile} 
+            userProfile={currentUser} 
             onNavigate={setCurrentScreen} 
             onOpenOnboarding={() => handleOpenAuth('signup')} 
           />
@@ -103,21 +100,28 @@ export function App() {
       case 'medications':
         return <MedicineReminder onNavigate={setCurrentScreen} />;
       case 'appointments':
-        return <AppointmentManager onNavigate={setCurrentScreen} />;
+        return <AppointmentManager onNavigate={setCurrentScreen} userProfile={currentUser} />;
       case 'reports':
         return <ReportAnalyzer onNavigate={setCurrentScreen} />;
       case 'profile':
         return (
           <HealthProfile 
-            userProfile={activeProfile} 
+            userProfile={currentUser} 
             onNavigate={setCurrentScreen} 
             onOpenOnboarding={() => handleOpenAuth('signup')} 
+            onUpdateProfile={handleUpdateProfile}
           />
         );
       case 'emergency':
         return <EmergencySOS onNavigate={setCurrentScreen} />;
       default:
-        return <LandingPage onNavigate={setCurrentScreen} />;
+        return (
+          <UserDashboard 
+            userProfile={currentUser} 
+            onNavigate={setCurrentScreen} 
+            onOpenOnboarding={() => handleOpenAuth('signup')} 
+          />
+        );
     }
   };
 
@@ -126,8 +130,8 @@ export function App() {
       {!currentUser && (
         <div className="bg-gradient-to-r from-[#0066FF] to-indigo-600 text-white px-4 py-2 text-xs md:text-sm font-medium flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <span className="bg-white/20 px-2 py-0.5 rounded text-white text-xs uppercase font-bold tracking-wider">Patient Portal</span>
-            <span>Welcome to MediMind AI. Sign in or create your personal account to access your medical records.</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded text-white text-xs uppercase font-bold tracking-wider">Authentication Portal</span>
+            <span>Please sign in or create an account to view your medical dashboard and health records.</span>
           </div>
           <div className="flex items-center gap-2">
             <button 
@@ -140,7 +144,7 @@ export function App() {
               onClick={() => handleOpenAuth('signup')}
               className="bg-white text-blue-700 hover:bg-blue-50 px-3 py-1 rounded-full font-semibold transition text-xs shadow"
             >
-              Create Account
+              Get Started
             </button>
           </div>
         </div>
@@ -148,7 +152,13 @@ export function App() {
 
       <Navigation 
         currentScreen={currentScreen} 
-        setCurrentScreen={setCurrentScreen} 
+        setCurrentScreen={(screen) => {
+          if (!currentUser && screen !== 'landing') {
+            handleOpenAuth('login');
+          } else {
+            setCurrentScreen(screen);
+          }
+        }} 
         userProfile={currentUser}
         onOpenAuth={handleOpenAuth}
         onLogout={handleLogout}

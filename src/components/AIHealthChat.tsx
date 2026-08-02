@@ -1,221 +1,240 @@
-import React, { useState } from 'react';
-import { ScreenId, ChatMessage } from '../types';
-import { 
-  Bot, 
-  User, 
-  Send, 
-  Mic, 
-  BookOpen, 
-  Sparkles, 
-  ShieldCheck, 
-  Paperclip, 
-  RefreshCw,
-  Info
-} from 'lucide-react';
+import { useState } from 'react';
+import { ChatMessage, ScreenId } from '../types';
+import { Bot, Send, User, Sparkles, Mic, Volume2, ShieldCheck, AlertCircle, Pill, HeartPulse, RefreshCw } from 'lucide-react';
 
 interface AIHealthChatProps {
   onNavigate: (screen: ScreenId) => void;
 }
 
-export const AIHealthChat: React.FC<AIHealthChatProps> = ({ onNavigate }) => {
+export function AIHealthChat({ onNavigate }: AIHealthChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       sender: 'ai',
-      text: "Hello Sarah! I am your MediMind AI Clinical Assistant. I can help analyze your symptoms, check medication safety, or summarize lab results.\n\nHow are you feeling today?",
-      timestamp: '10:24 AM'
+      text: "Hello! I'm your MediMind Clinical AI Assistant (v4.2). I can analyze your symptoms, suggest over-the-counter (OTC) medicines, and provide personalized rest and recovery advice. What symptoms are you experiencing today?",
+      timestamp: 'Just now',
+      riskLevel: 'Low',
     },
-    {
-      id: '2',
-      sender: 'user',
-      text: "I've been experiencing a sharp throbbing headache behind my left eye for the past 4 hours. Light seems to bother me slightly.",
-      timestamp: '10:25 AM'
-    },
-    {
-      id: '3',
-      sender: 'ai',
-      text: "Based on your description (unilateral throbbing pain behind the left eye accompanied by photophobia), this clinical presentation is consistent with a **Migraine headache** or **Cluster headache pattern**.\n\n**Key Observations:**\n• Duration: 4 hours (Acute onset)\n• Associated symptoms: Photophobia (light sensitivity)\n\n**Recommended Actions:**\n1. Rest in a dark, quiet room with cool compress.\n2. Hydrate with 500ml water.\n3. Monitor for warning signs like sudden speech difficulty, vision loss, or neck stiffness.",
-      timestamp: '10:26 AM',
-      isWarning: true,
-      sources: [
-        { title: 'Mayo Clinic: Unilateral Headache Assessment', url: 'https://www.mayoclinic.org' },
-        { title: 'PubMed: Acute Photophobia Triage Protocols', url: 'https://pubmed.ncbi.nlm.nih.gov' }
-      ]
-    }
   ]);
-
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSend = () => {
+  const generateAIResponse = (userQuery: string): ChatMessage => {
+    const q = userQuery.toLowerCase();
+    
+    // Symptom: Headache
+    if (q.includes('headache') || q.includes('head pain') || q.includes('migraine')) {
+      return {
+        id: Date.now().toString(),
+        sender: 'ai',
+        text: `### 🩺 Symptom Analysis: Tension / Mild Headache
+
+Based on your description, here are recommended OTC medication options and non-pharmacological recovery steps:
+
+#### 💊 Recommended OTC Medications:
+1. **Acetaminophen / Paracetamol (500 mg)**: Take 1 tablet every 6 hours after food as needed (Max 3,000 mg/day). Helps relieve moderate head pain.
+2. **Ibuprofen (200 mg - 400 mg)**: Non-steroidal anti-inflammatory (NSAID) for throbbing pain. Take with water & food.
+
+#### 🛌 Immediate Rest & Care Tips:
+- **Hydrate Immediately**: Drink **500 ml (2 cups) of cold water**, as 70% of acute headaches stem from mild dehydration.
+- **Dim Light & Quiet Rest**: Lie down in a dark, quiet room with your eyes closed for 30–45 minutes.
+- **Cold / Warm Compress**: Place a cool damp cloth over your forehead or temples to ease vascular tension.
+- **Avoid Screen Strain**: Pause phone/laptop usage to reduce ocular fatigue.
+
+> ⚠️ **Safety Disclaimer**: *If your headache is sudden and severe ('thunderclap'), accompanied by fever, neck stiffness, or vision changes, seek emergency medical care immediately.*`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        riskLevel: 'Low',
+        sources: [
+          { title: 'Mayo Clinic - Tension Headache Treatment', url: '#' },
+          { title: 'PubMed Health - OTC Analgesic Efficacy', url: '#' }
+        ]
+      };
+    }
+
+    // Symptom: Fever or Cold
+    if (q.includes('fever') || q.includes('temperature') || q.includes('cold') || q.includes('cough')) {
+      return {
+        id: Date.now().toString(),
+        sender: 'ai',
+        text: `### 🩺 Symptom Analysis: Fever & Viral Symptoms
+
+#### 💊 Recommended OTC Medications:
+1. **Paracetamol / Acetaminophen (500 mg)**: Effective antipyretic to reduce temperature and body aches. Take every 6 hours after food.
+2. **Cetirizine (10 mg)** or **Phenylephrine**: Helps relieve nasal congestion and runny nose (Take 1 tablet at bedtime).
+
+#### 🛌 Recovery & Hydration Advice:
+- **Complete Bed Rest**: Allow your body's immune system to dedicate energy toward fighting the viral infection.
+- **Warm Fluids & Electrolytes**: Drink warm herbal tea, ginger tea, or electrolyte solution (ORS) to replenish fluids.
+- **Steam Inhalation**: Inhale steam with a hot towel for 10 minutes to clear airway passages.
+
+> ⚠️ *Monitor body temperature. If fever exceeds 102°F (38.9°C) or lasts over 3 days, consult a physician.*`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        riskLevel: 'Moderate',
+        sources: [{ title: 'CDC - Managing Viral Fever & Influenza', url: '#' }]
+      };
+    }
+
+    // Symptom: Stomach pain or Acidity
+    if (q.includes('stomach') || q.includes('acidity') || q.includes('gas') || q.includes('nausea')) {
+      return {
+        id: Date.now().toString(),
+        sender: 'ai',
+        text: `### 🩺 Symptom Analysis: Gastric Distress & Acidity
+
+#### 💊 Recommended OTC Medications:
+1. **Antacid Gel / Chewable Tablets (Aluminium Hydroxide)**: Provides instant neutralization of stomach acid.
+2. **Omeprazole (20 mg)** or **Pantoprazole**: Take 30 minutes before breakfast for heartburn relief.
+
+#### 🛌 Care & Lifestyle Tips:
+- **Stay Upright**: Avoid lying down flat for 2 hours after eating.
+- **Sip Warm Water**: Drink small sips of warm water or chamomile tea.
+- **Bland Diet**: Eat light foods (bananas, rice, toast). Avoid spicy, oily, or acidic foods.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        riskLevel: 'Low',
+        sources: [{ title: 'Gastroenterology Guidelines for Acid Reflux', url: '#' }]
+      };
+    }
+
+    // Default general response
+    return {
+      id: Date.now().toString(),
+      sender: 'ai',
+      text: `Thank you for sharing your symptoms. I have logged this query into your clinical passport. 
+
+To give you the most accurate OTC medicine suggestions and care tips, could you let me know:
+1. When did this symptom start?
+2. Is the discomfort mild, moderate, or severe (1-10)?
+3. Are you currently taking any prescription medications?`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      riskLevel: 'Low',
+      sources: [{ title: 'MediMind Clinical Protocol Engine', url: '#' }]
+    };
+  };
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!input.trim()) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       sender: 'user',
       text: input,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages(prev => [...prev, userMsg]);
+    const currentQuery = input;
     setInput('');
     setIsTyping(true);
 
     setTimeout(() => {
-      const aiMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        sender: 'ai',
-        text: `Thank you for sharing that detail. I have logged this query into your health profile. Based on your current records and symptoms, I recommend scheduling a consultation with your Neurologist, Dr. Elena Rostova, if pain persists past 8 hours.`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        sources: [
-          { title: 'Clinical Guideline: Tension & Vascular Headache Pathways', url: '#' }
-        ]
-      };
+      const aiMsg = generateAIResponse(currentQuery);
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
-    }, 1200);
+    }, 800);
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
-      
-      {/* Header Banner */}
-      <div className="flex items-center justify-between glass-card p-4 rounded-2xl border-blue-200">
+    <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-900 to-[#0066FF] rounded-2xl p-5 text-white flex items-center justify-between shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md">
-            <Bot className="w-6 h-6" />
+          <div className="p-3 bg-white/10 rounded-xl backdrop-blur-md">
+            <Bot className="w-6 h-6 text-blue-300" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-extrabold text-base text-slate-900">MediMind Health Assistant</h1>
-              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold">Engine v4.2</span>
-            </div>
-            <p className="text-xs text-slate-500">HIPAA Compliant &bull; 256-bit Encrypted Triage</p>
+            <h1 className="font-extrabold text-lg flex items-center gap-2">
+              AI Clinical Health Assistant
+              <span className="bg-blue-500/30 text-blue-200 text-[10px] px-2 py-0.5 rounded-full font-bold">v4.2 Active</span>
+            </h1>
+            <p className="text-xs text-blue-100">Medicine recommendations, rest tips, and symptom analysis</p>
           </div>
         </div>
 
         <button 
-          onClick={() => setMessages(messages.slice(0, 1))}
-          className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5"
+          onClick={() => onNavigate('symptoms')}
+          className="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 transition hidden sm:flex items-center gap-1.5"
         >
-          <RefreshCw className="w-4 h-4" />
-          <span className="hidden sm:inline">Reset Session</span>
+          <HeartPulse className="w-4 h-4 text-emerald-400" />
+          Launch 3D Symptom Checker
         </button>
       </div>
 
-      {/* Suggested Prompts Bento Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {/* Quick Prompt Chips */}
+      <div className="flex flex-wrap gap-2">
         {[
-          { icon: '🧠', title: 'Analyze Symptoms', text: '"Analyze my headache behind left eye"' },
-          { icon: '💊', title: 'Drug Interaction', text: '"Check Amoxicillin & Ibuprofen safety"' },
-          { icon: '🥗', title: 'Wellness Tips', text: '"Best hydration plan for deep REM sleep"' },
-        ].map((item, idx) => (
+          "I have a severe headache, what medicine should I take?",
+          "Suggest medicines & rest tips for fever & cold",
+          "What can I take for stomach acidity and gas?",
+          "How to get rid of muscle pain and fatigue?"
+        ].map((prompt, i) => (
           <button
-            key={idx}
-            onClick={() => setInput(item.text.replace(/"/g, ''))}
-            className="p-3.5 rounded-2xl bg-white border border-slate-200/70 hover:border-blue-500 text-left transition-all hover:shadow-md group"
+            key={i}
+            onClick={() => {
+              setInput(prompt);
+            }}
+            className="text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-[#0066FF] border border-slate-200 px-3 py-1.5 rounded-full transition shadow-sm font-medium flex items-center gap-1.5"
           >
-            <span className="text-xl mb-1 block group-hover:scale-110 transition-transform">{item.icon}</span>
-            <p className="font-bold text-xs text-slate-900">{item.title}</p>
-            <p className="text-[11px] text-slate-500 truncate mt-0.5">{item.text}</p>
+            <Sparkles className="w-3 h-3 text-[#0066FF]" />
+            {prompt}
           </button>
         ))}
       </div>
 
-      {/* Messages Stream */}
-      <div className="space-y-4">
+      {/* Chat Messages Stream */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-6 space-y-4 min-h-[420px] max-h-[550px] overflow-y-auto">
         {messages.map((msg) => (
-          <div 
-            key={msg.id}
-            className={`flex items-start gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
-          >
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm ${
-              msg.sender === 'user' ? 'bg-slate-800' : 'bg-blue-600'
+          <div key={msg.id} className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.sender === 'ai' && (
+              <div className="w-8 h-8 rounded-xl bg-[#0066FF] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow">
+                AI
+              </div>
+            )}
+
+            <div className={`max-w-2xl rounded-2xl p-4 text-xs md:text-sm leading-relaxed space-y-2 ${
+              msg.sender === 'user' 
+                ? 'bg-[#0066FF] text-white rounded-br-none shadow-md shadow-blue-500/10' 
+                : 'bg-slate-50 text-slate-800 border border-slate-200/80 rounded-bl-none'
             }`}>
-              {msg.sender === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+              <div className="whitespace-pre-wrap">{msg.text}</div>
+              <span className={`block text-[10px] ${msg.sender === 'user' ? 'text-blue-200 text-right' : 'text-slate-400'}`}>
+                {msg.timestamp}
+              </span>
             </div>
 
-            <div className={`max-w-[85%] sm:max-w-[75%] space-y-2`}>
-              <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                msg.sender === 'user' 
-                  ? 'bg-blue-600 text-white rounded-tr-none shadow-md' 
-                  : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-none shadow-sm'
-              }`}>
-                {msg.text.split('\n').map((paragraph, i) => (
-                  <p key={i} className={i > 0 ? 'mt-2' : ''}>{paragraph}</p>
-                ))}
-
-                {msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                      <BookOpen className="w-3 h-3 text-blue-600" /> Cited Medical Context
-                    </p>
-                    {msg.sources.map((src, sIdx) => (
-                      <a 
-                        key={sIdx} 
-                        href={src.url} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="block text-xs font-semibold text-blue-600 hover:underline"
-                      >
-                        &bull; {src.title}
-                      </a>
-                    ))}
-                  </div>
-                )}
+            {msg.sender === 'user' && (
+              <div className="w-8 h-8 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                You
               </div>
-
-              <div className={`flex items-center gap-2 text-[10px] text-slate-400 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
-                <span>{msg.timestamp}</span>
-                {msg.sender === 'ai' && (
-                  <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                    <ShieldCheck className="w-3 h-3" /> Verified Diagnostic Engine
-                  </span>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         ))}
 
         {isTyping && (
-          <div className="flex items-center gap-2 text-xs text-slate-400 italic font-medium p-2">
-            <Bot className="w-4 h-4 text-blue-600 animate-spin" />
-            <span>MediMind AI is analyzing clinical literature...</span>
+          <div className="flex gap-2 items-center text-xs text-slate-400 p-2">
+            <Bot className="w-4 h-4 text-[#0066FF] animate-spin" />
+            <span>MediMind Clinical AI is evaluating medical literature & dosage protocols...</span>
           </div>
         )}
       </div>
 
       {/* Input Bar */}
-      <div className="sticky bottom-4 bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-slate-300 shadow-xl flex items-center gap-3">
-        <button 
-          onClick={() => alert("Voice Dictation active. Speak clearly into microphone.")}
-          className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-          title="Voice Dictation"
-        >
-          <Mic className="w-5 h-5" />
-        </button>
-
-        <input 
-          type="text" 
+      <form onSubmit={handleSend} className="flex gap-2">
+        <input
+          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask MediMind AI about symptoms, medications, or lab values..."
-          className="flex-1 bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400 font-medium"
+          placeholder="Describe how you feel (e.g. 'I have a headache' or 'I feel feverish')..."
+          className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-2xl text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-[#0066FF] shadow-sm"
         />
-
-        <button 
-          onClick={handleSend}
-          disabled={!input.trim()}
-          className="p-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 disabled:opacity-40 transition-all shadow-md"
+        <button
+          type="submit"
+          className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl text-xs md:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-500/20"
         >
-          <Send className="w-5 h-5" />
+          <Send className="w-4 h-4" />
+          <span>Ask AI</span>
         </button>
-      </div>
-
-      <div className="text-center text-[11px] text-slate-400">
-        <p>Disclaimer: AI advice is for informational guidance and not a substitute for professional medical care.</p>
-      </div>
+      </form>
     </div>
   );
-};
+}

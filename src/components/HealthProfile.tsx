@@ -17,7 +17,8 @@ import {
   Download,
   CheckCircle2,
   X,
-  Save
+  Save,
+  PhoneCall
 } from 'lucide-react';
 
 interface HealthProfileProps {
@@ -29,8 +30,6 @@ interface HealthProfileProps {
 
 export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpdateProfile }: HealthProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Editable form state
   const [formData, setFormData] = useState<UserProfile>(userProfile);
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -95,10 +94,10 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
       {/* Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left Column: Personal Contact & Address Details */}
+        {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
           
-          {/* Residential & Contact Card */}
+          {/* Residential Card */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -110,7 +109,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
                 className="text-xs font-bold text-[#0066FF] hover:underline flex items-center gap-1"
               >
                 <Edit3 className="w-3 h-3" />
-                Edit Address
+                Edit Info
               </button>
             </div>
 
@@ -194,10 +193,10 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
           </div>
         </div>
 
-        {/* Right Column: Insurance & Primary Care Doctor */}
+        {/* Right Column */}
         <div className="space-y-6">
           
-          {/* Insurance & Coverage Card */}
+          {/* Insurance Card */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
               <CreditCard className="w-5 h-5 text-indigo-600" />
@@ -227,30 +226,17 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
             </div>
           </div>
 
-          {/* Primary Care Physician Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Stethoscope className="w-5 h-5 text-[#0066FF]" />
-              Primary Care Physician
-            </h2>
-
-            <div className="flex items-center gap-3 bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow">
-                MD
-              </div>
-              <div className="text-xs">
-                <p className="font-bold text-slate-900 text-sm">{userProfile.primaryPhysician || 'Dr. Marcus Vance, MD'}</p>
-                <p className="text-slate-500">Internal Medicine & Primary Care</p>
-              </div>
-            </div>
-          </div>
-
           {/* Emergency Contact Card */}
-          <div className="bg-red-50/40 rounded-2xl p-6 border border-red-200/60 shadow-sm space-y-3">
-            <h2 className="text-base font-bold text-red-900 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              Emergency Contact
-            </h2>
+          <div className="bg-red-50/50 rounded-2xl p-6 border border-red-200/80 shadow-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-red-100 pb-2">
+              <h2 className="text-base font-bold text-red-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                Emergency Contact
+              </h2>
+              <button onClick={() => setIsEditing(true)} className="text-xs font-bold text-red-700 hover:underline">
+                Edit Contact
+              </button>
+            </div>
 
             <div className="text-xs space-y-1">
               <p className="font-bold text-slate-900">{userProfile.emergencyContactName}</p>
@@ -269,7 +255,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-[#0066FF]" />
-                Edit My Profile Data
+                Edit My Patient Profile & Emergency Contact
               </h3>
               <button onClick={() => setIsEditing(false)} className="p-1 text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -278,7 +264,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
 
             <form onSubmit={handleSaveProfile} className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Full Name</label>
+                <label className="block font-semibold text-slate-700 mb-1">Full Legal Name</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -305,6 +291,36 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                   />
+                </div>
+              </div>
+
+              {/* Emergency Contact Edit Fields (REQ 3) */}
+              <div className="bg-red-50/60 p-3 rounded-xl border border-red-200 space-y-2">
+                <span className="font-bold text-red-900 block flex items-center gap-1.5">
+                  <PhoneCall className="w-4 h-4 text-red-600" />
+                  Emergency Contact Settings
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Contact Name</label>
+                    <input
+                      type="text"
+                      value={formData.emergencyContactName}
+                      onChange={(e) => setFormData({ ...formData, emergencyContactName: e.target.value })}
+                      placeholder="David Jenkins (Spouse)"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Contact Phone</label>
+                    <input
+                      type="text"
+                      value={formData.emergencyContactPhone}
+                      onChange={(e) => setFormData({ ...formData, emergencyContactPhone: e.target.value })}
+                      placeholder="+1 (555) 019-2834"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -364,7 +380,7 @@ export function HealthProfile({ userProfile, onNavigate, onOpenOnboarding, onUpd
                 className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 shadow"
               >
                 <Save className="w-4 h-4" />
-                <span>Save My Updated Profile Data</span>
+                <span>Save All Profile & Contact Updates</span>
               </button>
             </form>
           </div>
